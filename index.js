@@ -14,8 +14,8 @@ app.use(bodyParser.json()); // for parsing application/json
 
 const path = dirname(require.main.filename) + "/icon/";
 
-app.get("/get-icon", function (req, res) {
-  const icon = req.body.icon;
+app.get("/get-icon/:icon", function (req, res) {
+  const icon = req.params.icon;
   try {
     const pngPath = `${path}/${icon}.png`;
     if (fs.existsSync(pngPath)) {
