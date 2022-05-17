@@ -3,6 +3,9 @@ var fs = require("fs"),
   request = require("request");
 var unirest = require("unirest");
 var bodyParser = require("body-parser");
+var dotenv = require("dotenv").config({
+  path: __dirname + "/.env",
+});
 const { dirname } = require("path");
 const port = process.env.PORT || 3000;
 
@@ -41,7 +44,7 @@ app.get("/get-icon/:icon", function (req, resp) {
 async function getLogoCMC(icon,resp){
     unirest('GET', `https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?symbol=${icon}`)
   .headers({
-    'X-CMC_PRO_API_KEY': 'f5152911-7792-4e43-81a9-9aa5283d11a4'
+    'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY
   })
   .end(async function (res) { 
     if (res.error) throw new Error(res.error); 
