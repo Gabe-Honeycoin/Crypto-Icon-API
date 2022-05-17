@@ -46,7 +46,7 @@ async function getLogoCMC(icon,resp){
   .headers({
     'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY
   })
-  .end(async function (res) { 
+  .then(async function (res) { 
     if (res.error) throw new Error(res.error); 
     let logo_uri  = await res.body.data[`${icon.toUpperCase()}`][0].logo;
     download(
@@ -58,6 +58,12 @@ async function getLogoCMC(icon,resp){
         }
       );
     
+  }).catch((err) => {
+    resp.status(400).json({
+      status: 400,
+      message: "failed",
+      error: err.message,
+    });
   });
 }
 
