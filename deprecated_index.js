@@ -29,7 +29,15 @@ app.get("/get-icon/:icon", function (req, resp) {
     if (fs.existsSync(pngPath)) {
       resp.sendFile(pngPath);
     } else {
-        getLogoCMC(icon,resp)
+      download(
+        `https://ui-avatars.com/api/?background=random&name=${icon}`,
+        "temp.png",
+        function () {
+          console.log("done");
+
+          resp.sendFile(`${dirname(require.main.filename)}/temp.png`);
+        }
+      );
     }
   } catch (err) {
     resp.status(403).json({
@@ -37,26 +45,6 @@ app.get("/get-icon/:icon", function (req, resp) {
     });
   }
 });
-
-async function getLogoCMC(icon,resp){
-    unirest('GET', `https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?symbol=${icon}`)
-  .headers({
-    'X-CMC_PRO_API_KEY': 'f5152911-7792-4e43-81a9-9aa5283d11a4'
-  })
-  .end(async function (res) { 
-    if (res.error) throw new Error(res.error); 
-    let logo_uri  = await res.body.data[`${icon.toUpperCase()}`][0].logo;
-    download(
-        logo_uri,
-        "temp.png",
-         ()=> {
-          console.log("done");
-          resp.sendFile(`${dirname(require.main.filename)}/temp.png`);
-        }
-      );
-    
-  });
-}
 
 var download = function (uri, filename, callback) {
   request.head(uri, function (err, res, body) {
