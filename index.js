@@ -32,7 +32,20 @@ app.get("/get-icon/:icon", function (req, resp) {
     if (fs.existsSync(pngPath)) {
       resp.sendFile(pngPath);
     } else {
-        getLogoCMC(icon,resp)
+        try{
+          getLogoCMC(icon,resp)
+        }catch(err){
+          console.log("Getting UI Characters")
+          download(
+            `https://ui-avatars.com/api/?background=random&name=${icon}`,
+            "temp.png",
+            function () {
+              console.log("done");
+    
+              resp.sendFile(`${dirname(require.main.filename)}/temp.png`);
+            }
+          );
+        }
     }
   } catch (err) {
     resp.status(403).json({
@@ -42,6 +55,7 @@ app.get("/get-icon/:icon", function (req, resp) {
 });
 
 async function getLogoCMC(icon,resp){
+  console.log("checking CMC")
     unirest('GET', `https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?symbol=${icon}`)
   .headers({
     'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY
@@ -59,11 +73,17 @@ async function getLogoCMC(icon,resp){
       );
     
   }).catch((err) => {
-    resp.status(400).json({
-      status: 400,
-      message: "failed",
-      error: err.message,
-    });
+    console.log(err)
+    console.log("Getting UI Characters")
+      download(
+        `https://ui-avatars.com/api/?background=random&name=${icon}`,
+        "temp.png",
+        function () {
+          console.log("done");
+
+          resp.sendFile(`${dirname(require.main.filename)}/temp.png`);
+        }
+      );
   });
 }
 
